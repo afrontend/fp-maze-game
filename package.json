@@ -1,6 +1,27 @@
 {
   "name": "fp-maze-game",
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "version": "0.1.0",
+  "description": "자바스크립트로 만든 maze 게임",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afrontend/fp-maze-game.git"
+  },
+  "homepage": "https://afrontend.github.io/game/fp-maze-game",
+  "keywords": [
+    "game",
+    "javascript",
+    "lodash",
+    "react",
+    "maze"
+  ],
+  "author": "<frontend.wordpress@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/afrontend/fp-maze-game/issues"
+  },
   "private": true,
   "dependencies": {
     "react": "^16.7.0",
