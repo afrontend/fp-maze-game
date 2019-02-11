@@ -12,7 +12,7 @@
 }
 
 .App .block {
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
   box-sizing: border-box;
   font-size: 1em;
   font-weight: bold;
@@ -20,6 +20,10 @@
   line-height: calc(25px + 2px);
   text-align: center;
   width: 25px;
+}
+
+.block.left {
+ border-left: 2px solid #000
 }
 
 .logo {
