@@ -52,6 +52,78 @@ const paint = (panel, posAry, color) => {
 
 // path
 
+const matchKey = (akey, bkey) => (akey === bkey ? 1 : 0);
+const isBlank = item => ( item && item.color === CONFIG.color ? true : false );
+const isNotBlank = item => (item.color !== CONFIG.color);
+const reIndexing = ary => {
+  return ary.map((item, index) => {
+    item.index = index;
+    return item;
+  });
+};
+
+const getHeadItem = _.flow([
+  _.cloneDeep,
+  convert1DimAry,
+  fp.filter(isNotBlank),
+  fp.sortBy('index'),
+  _.head
+]);
+
+const getNextItem = (pathPanel, key) => {
+  const headItem = getHeadItem(pathPanel);
+  const { row, column } = getNewRowColumn(headItem, key);
+  return pathPanel && pathPanel[row] && pathPanel[row][column] ? pathPanel[row][column] : undefined;
+};
+const nextItemIsBlank = _.flow([getNextItem, isBlank]);
+
+const arrowKey = ({ pathPanel, key }) => {
+  const headItem = getHeadItem(pathPanel);
+  const origKey = pathPanel[headItem.row][headItem.column].key;
+  pathPanel[headItem.row][headItem.column].key = nextItemIsBlank(pathPanel, key) ? key : origKey;
+  return {
+    pathPanel
+  };
+};
+
+const nop = (nop) => (nop);
+
+const LEFT = 37;
+const UP = 38;
+const RIGHT = 39;
+const DOWN = 40;
+
+const keyFnList = [
+  { key: LEFT , fn: arrowKey },
+  { key: UP   , fn: arrowKey },
+  { key: RIGHT, fn: arrowKey },
+  { key: DOWN , fn: arrowKey },
+  { key: 0    , fn: nop }
+];
+
+const getNewRowColumn = (headItem, key) => ({
+  row: headItem.row - matchKey(key, UP) + matchKey(key, DOWN),
+  column: headItem.column - matchKey(key, LEFT) + matchKey(key, RIGHT)
+});
+
+const addHeadItem = ary => {
+  const snake = _.cloneDeep(ary);
+  const headItem = _.cloneDeep(_.head(snake));
+  const newHeadItem = _.assign(headItem, getNewRowColumn(headItem, headItem.key));
+  return [newHeadItem, ...snake];
+};
+
+const justPaintPath = posAry => (paint(createPanel(), posAry, CONFIG.snakeColor));
+
+const moveSnakeAndAddTail = _.flow([
+  convert1DimAry,
+  fp.filter(isNotBlank),
+  fp.sortBy('index'),
+  addHeadItem,
+  reIndexing,
+  justPaintPath
+]);
+
 const paintPath = panel => {
   return paint(panel, [{
     row: 12,
@@ -59,7 +131,36 @@ const paintPath = panel => {
   }], CONFIG.pathColor);
 };
 
-const updatePath = f => f;
+// panel
+
+const nextItemIsOutOfRange = _.flow([getNextItem, _.isUndefined]);
+
+const updatePanel = ({ pathPanel }) => {
+  const outOfRange = nextItemIsOutOfRange(pathPanel, getHeadItem(pathPanel).key)
+  const newPathPanel = outOfRange ? pathPanel : moveSnakeAndAddTail(pathPanel);
+  return {
+    pathPanel: newPathPanel
+  };
+};
+
+// process key
+
+const isValidKey = key => (_.some(keyFnList, (item) => (item.key === key)));
+const validKey = ({ pathPanel, key }) => (
+  {
+    pathPanel,
+    key: isValidKey(key) ? key : 0
+  }
+);
+
+const storeKey = ({ pathPanel, key }) => (
+  _.find(keyFnList, (item) => (
+    item.key === key
+  )).fn({ pathPanel, key })
+);
+
+const processKey = _.flow([validKey, storeKey]);
+
 
 /*
 const paintPath = panel => {
@@ -123,10 +224,20 @@ class App extends Component {
     this.state.timer = setInterval(() => {
       this.setState((state) => {
         return {
-          pathPanel: updatePath(state.pathPanel),
+          pathPanel: moveSnakeAndAddTail(state.pathPanel)
         };
       });
     }, 1000);
+
+    this.state.keyTimer = setInterval(() => {
+      this.setState((state) => {
+        return processKey({
+          pathPanel: state.pathPanel,
+          key: UP
+        });
+      });
+    }, 1000);
+
   }
 
   render() {
