@@ -62,6 +62,11 @@ const reIndexing = ary => {
   });
 };
 
+const tee = (args) => {
+  console.log("tee", args);
+  return args;
+}
+
 const getHeadItem = _.flow([
   _.cloneDeep,
   convert1DimAry,
@@ -113,7 +118,7 @@ const addHeadItem = ary => {
   return [newHeadItem, ...snake];
 };
 
-const justPaintPath = posAry => (paint(createPanel(), posAry, CONFIG.snakeColor));
+const justPaintPath = posAry => (paint(createPanel(), posAry, CONFIG.pathColor));
 
 const moveSnakeAndAddTail = _.flow([
   convert1DimAry,
@@ -127,7 +132,8 @@ const moveSnakeAndAddTail = _.flow([
 const paintPath = panel => {
   return paint(panel, [{
     row: 12,
-    column: 12
+    column: 12,
+    key: 0
   }], CONFIG.pathColor);
 };
 
@@ -135,12 +141,10 @@ const paintPath = panel => {
 
 const nextItemIsOutOfRange = _.flow([getNextItem, _.isUndefined]);
 
-const updatePanel = ({ pathPanel }) => {
+const updatePanel = pathPanel => {
   const outOfRange = nextItemIsOutOfRange(pathPanel, getHeadItem(pathPanel).key)
   const newPathPanel = outOfRange ? pathPanel : moveSnakeAndAddTail(pathPanel);
-  return {
-    pathPanel: newPathPanel
-  };
+  return newPathPanel;
 };
 
 // process key
@@ -160,16 +164,6 @@ const storeKey = ({ pathPanel, key }) => (
 );
 
 const processKey = _.flow([validKey, storeKey]);
-
-
-/*
-const paintPath = panel => {
-  return paint(panel, [{
-    row: _.random(0, panel.length - 1),
-    column: _.random(0, panel[0].length - 1)
-  }], CONFIG.pathColor);
-};
-*/
 
 // react components
 
@@ -212,7 +206,18 @@ const addWall = panel => {
   return convert2DimAry(ary);
 }
 
-const createPathPanel = _.flow([createPanel, paintPath, addWall]);
+const createPathPanel = _.flow([createPanel, paintPath]);
+
+const getKeys = _.flow([
+  fp.filter((item) => (item.key !== 0)),
+  fp.map((item) => ( item.key ))
+]);
+
+const getRandomKey = _.flow([
+  getKeys,
+  _.shuffle,
+  _.head
+]);
 
 class App extends Component {
   constructor(props) {
@@ -224,20 +229,19 @@ class App extends Component {
     this.state.timer = setInterval(() => {
       this.setState((state) => {
         return {
-          pathPanel: moveSnakeAndAddTail(state.pathPanel)
+          pathPanel: updatePanel(state.pathPanel)
         };
       });
-    }, 1000);
+    });
 
     this.state.keyTimer = setInterval(() => {
       this.setState((state) => {
         return processKey({
           pathPanel: state.pathPanel,
-          key: UP
+          key: getRandomKey(keyFnList)
         });
       });
-    }, 1000);
-
+    });
   }
 
   render() {
