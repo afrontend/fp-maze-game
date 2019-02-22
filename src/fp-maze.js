@@ -164,42 +164,41 @@ const updatePanel = pathPanel => {
 
 // process key
 
-const isValidKey = key => (_.some(keyFnList, (item) => (item.key === key)));
-const validKey = ({ pathPanel, key }) => (
-  {
-    pathPanel,
-    key: isValidKey(key) ? key : 0
-  }
-);
+/*
+ * const isValidKey = key => (_.some(keyFnList, (item) => (item.key === key)));
+ * const validKey = ({ pathPanel, key }) => (
+ *   {
+ *     pathPanel,
+ *     key: isValidKey(key) ? key : 0
+ *   }
+ * );
+ */
 
-const storeKey = ({ pathPanel, key }) => (
-  _.find(keyFnList, (item) => (
-    item.key === key
-  )).fn({ pathPanel, key })
-);
+const markTreeRoot = (panel) => (panel);
+const expandTree = (panel) => (panel);
 
-const processKey = _.flow([validKey, storeKey]);
+const makeTree = _.flow([
+  markTreeRoot,
+  expandTree
+]);
 
 // test
 
 const addWall = panel => {
   const newPanel = _.cloneDeep(panel);
   const ary =  _.map(convert1DimAry(newPanel), (item) => {
-    item.top = true;
-    item.right = true;
-    item.bottom = true;
-    item.left = true;
+    item.top = false;
+    item.right = false;
+    item.bottom = false;
+    item.left = false;
     return item;
   });
   return convert2DimAry(ary);
 }
 
 export const initPathPanel = () => ({pathPanel: createPathPanel()});
-
-export const movePathPanel = (state) => ({ pathPanel: updatePanel(state.pathPanel) });
-
-export const keyPathPanel = (state) => (processKey({ pathPanel: state.pathPanel, key: getRandomKey(keyFnList) }));
-
+export const markPathPanel = (state) => ({ pathPanel: updatePanel(state.pathPanel) });
+export const keyPathPanel = (state) => (makeTree({ pathPanel: state.pathPanel }));
 export const joinPathPanel = (state) => (convert1DimAry(state.pathPanel));
 
 export default {};

@@ -8,12 +8,12 @@ import React, { Component } from 'react';
 import './App.css';
 import {
   initPathPanel,
-  movePathPanel,
+  markPathPanel,
   keyPathPanel,
   joinPathPanel
-} from './fp-maze'
+} from './fp-maze';
 
-const getWall = props => {
+const getWallClassName = props => {
   const className = ['block'];
   if(props.top) className.push('top');
   if(props.right) className.push('right');
@@ -23,7 +23,7 @@ const getWall = props => {
 };
 
 const Block = props => (
-  <div className={getWall(props.item)} style={{backgroundColor: props.color}}>
+  <div className={getWallClassName(props.item)} style={{backgroundColor: props.color}}>
     {props.children}
   </div>
 );
@@ -45,7 +45,7 @@ class App extends Component {
     super(props);
     this.state = initPathPanel();
     this.state.timer = setInterval(() => {
-      this.setState((state) => (movePathPanel(state)));
+      this.setState((state) => (markPathPanel(state)));
     });
 
     this.state.keyTimer = setInterval(() => {
