@@ -9,7 +9,6 @@ import './App.css';
 import {
   initPathPanel,
   markPathPanel,
-  keyPathPanel,
   joinPathPanel
 } from './fp-maze';
 
@@ -32,7 +31,7 @@ const createBlocks = ary => (
   ary.map(
     (item, index) => (
       <Block item={item} color={item.color} key={index}>
-        {item.count}
+        {item.links.length}
       </Block>
     )
   )
@@ -46,11 +45,7 @@ class App extends Component {
     this.state = initPathPanel();
     this.state.timer = setInterval(() => {
       this.setState((state) => (markPathPanel(state)));
-    });
-
-    this.state.keyTimer = setInterval(() => {
-      this.setState((state) => (keyPathPanel(state)));
-    });
+    }, 1000);
   }
 
   render() {

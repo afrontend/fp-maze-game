@@ -29,11 +29,14 @@ const getAry = (len, fn) => (
     : null)
   ));
 
-const createItem = () => ({ color: CONFIG.color });
-const getEmptyRow = () => (getAry(CONFIG.columns, createItem));
-const createPanel = () => (getAry(CONFIG.rows, getEmptyRow));
 const convert1DimAry = _.flattenDepth;
 const convert2DimAry = fp.chunk(CONFIG.columns)
+const createItem = () => ({
+  color: CONFIG.color,
+  links: null,
+  visited: false
+});
+const createPanel = () => (convert2DimAry(getAry(CONFIG.columns * CONFIG.rows, createItem)));
 
 // paint
 
@@ -57,8 +60,7 @@ const paintPath = panel => {
   }], CONFIG.pathColor);
 };
 
-
-const createPathPanel = _.flow([createPanel, paintPath]);
+const createPathPanel = _.flow([createPanel]);
 
 // path
 
@@ -174,13 +176,61 @@ const updatePanel = pathPanel => {
  * );
  */
 
-const markTreeRoot = (panel) => (panel);
-const expandTree = (panel) => (panel);
+const getItem = (panel, p) => (panel[p.row] && panel[p.row][p.col] ? panel[p.row][p.col] : undefined);
 
-const makeTree = _.flow([
-  markTreeRoot,
-  expandTree
-]);
+const getAdjacentItems = (panel, pos) => {
+  const adjacentItems = [];
+  const fourWayPos = _.shuffle([
+    {row: pos.row - 1, col: pos.col},
+    {row: pos.row, col: pos.col + 1},
+    {row: pos.row + 1, col: pos.col},
+    {row: pos.row, col: pos.col - 1}
+  ]);
+  _.each(fourWayPos, (p) => {
+    const item = panel[p.row] && panel[p.row][p.col] ? panel[p.row][p.col] : undefined;
+    if (item && item.visited !== true) {
+      item.visited = true;
+      adjacentItems.push(p);
+    }
+  });
+
+  return adjacentItems;
+};
+
+/*
+ * const hasUnvisitedItem = (panel, links) => (
+ *   _.some(links, (pos) => {
+ *     return getItem(panel, pos).visited !== true;
+ *   })
+ * );
+ */
+
+const getLeafItem = (panel) => {
+  const ary = convert1DimAry(panel);
+  const leafItems = _.filter(ary, (item) => (item.visited && item.links = null));
+  if (leafItems.length > 0) {
+    return _.head(_.shuffle(leafItems)).pos;
+  }
+  return { row: 0, col: 0 };
+}
+
+const fillTree = (panel) => {
+  const curPos = getLeafItem(panel);
+  if (!panel) return panel
+  const curItem = getItem(panel, curPos);
+  console.log('curItem', curItem);
+  if (curItem.visited) return panel
+  curItem.visited = true;
+  curItem.color = CONFIG.pathColor;
+  curItem.pos= { row: curPos.row, col: curPos.col };
+  console.log('curItem', curItem);
+  curItem.links = getAdjacentItems(panel, curPos);
+  return panel;
+};
+
+const markTree = (panel) => {
+  return fillTree(panel);
+}
 
 // test
 
@@ -197,8 +247,7 @@ const addWall = panel => {
 }
 
 export const initPathPanel = () => ({pathPanel: createPathPanel()});
-export const markPathPanel = (state) => ({ pathPanel: updatePanel(state.pathPanel) });
-export const keyPathPanel = (state) => (makeTree({ pathPanel: state.pathPanel }));
+export const markPathPanel = (state) => ({ pathPanel: markTree(state.pathPanel) });
 export const joinPathPanel = (state) => (convert1DimAry(state.pathPanel));
 
 export default {};
