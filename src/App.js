@@ -31,7 +31,7 @@ const createBlocks = ary => (
   ary.map(
     (item, index) => (
       <Block item={item} color={item.color} key={index}>
-        {item.links.length}
+        {item.links === null ? ' ' : (item.links.length === 0 ? 'O' : ' ')}
       </Block>
     )
   )
@@ -45,7 +45,7 @@ class App extends Component {
     this.state = initPathPanel();
     this.state.timer = setInterval(() => {
       this.setState((state) => (markPathPanel(state)));
-    }, 1000);
+    });
   }
 
   render() {
