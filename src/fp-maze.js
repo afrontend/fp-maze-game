@@ -11,8 +11,8 @@ import './App.css';
 // configuration
 
 const CONFIG = {
-  rows: 25,
-  columns: 25,
+  rows: 40,
+  columns: 40,
   color: 'grey' ,
   pathColor: 'blue'
 };
@@ -111,6 +111,13 @@ const getAdjacentPosition = (panel, pos, testFn ) => {
   return adjacentPositions;
 };
 
+const markLastItem = (panel) => {
+  const ary = convert1DimAry(panel);
+  const lastItem = _.maxBy(ary, (item) => (item.depth));
+  lastItem.color = 'red';
+  return panel;
+}
+
 const fillTree = (panel) => {
   const curItem = getLeafItem(panel);
   if (curItem) {
@@ -129,6 +136,8 @@ const fillTree = (panel) => {
       nextItem.depth = curItem.depth + 1;
     });
     console.log('item', curItem);
+  } else {
+    markLastItem(panel);
   }
   return panel;
 };
