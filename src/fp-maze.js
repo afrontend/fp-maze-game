@@ -36,6 +36,12 @@ const createItem = () => ({
   links: null,
   visited: false,
   willVisit: false,
+  wall: {
+    up: false,
+    right: false,
+    down: false,
+    left: false
+  }
 });
 const addPos = (panel) => {
   panel.forEach((rows, rIndex) => (
@@ -50,6 +56,7 @@ const addPos = (panel) => {
 const addStartItem = (panel) => {
   const startItem = panel[0][0];
   startItem.willVisit = true;
+  startItem.depth = 1;
   startItem.pos = {
     row: 0,
     col: 0
@@ -90,10 +97,10 @@ const getColor = (item) => {
 const getAdjacentPosition = (panel, pos, testFn ) => {
   const adjacentPositions = [];
   const fourWayPos = _.shuffle([
-    {row: pos.row - 1, col: pos.col},
-    {row: pos.row, col: pos.col + 1},
-    {row: pos.row + 1, col: pos.col},
-    {row: pos.row, col: pos.col - 1}
+    {row: pos.row - 1, col: pos.col, direction: 'up', rDirection: 'down'},
+    {row: pos.row, col: pos.col + 1, direction: 'right', rDirection: 'left'},
+    {row: pos.row + 1, col: pos.col, direction: 'down', rDirection: 'up'},
+    {row: pos.row, col: pos.col - 1, direction: 'left', rDirection: 'right'}
   ]);
   _.each(fourWayPos, (p) => {
     const item = panel[p.row] && panel[p.row][p.col] ? panel[p.row][p.col] : undefined;
@@ -105,20 +112,23 @@ const getAdjacentPosition = (panel, pos, testFn ) => {
 };
 
 const fillTree = (panel) => {
-  const item = getLeafItem(panel);
-  if (item) {
-    item.visited = true;
-    item.willVisit = false;
-    item.color = getColor(item);
-    item.links = getAdjacentPosition(panel, item.pos, (item) => (
+  const curItem = getLeafItem(panel);
+  if (curItem) {
+    curItem.visited = true;
+    curItem.willVisit = false;
+    curItem.color = getColor(curItem);
+    curItem.links = getAdjacentPosition(panel, curItem.pos, (item) => (
       item.visited !== true && item.willVisit !== true)
     );
-    _.each(item.links, (pos) => {
-      const item = getItem(panel, pos);
-      item.willVisit = true;
-      item.color = getColor(item);
+    _.each(curItem.links, (pos) => {
+      curItem.wall[pos.direction] = true;
+      const nextItem = getItem(panel, pos);
+      nextItem.wall[pos.rDirection] = true;
+      nextItem.willVisit = true;
+      nextItem.color = getColor(nextItem);
+      nextItem.depth = curItem.depth + 1;
     });
-    console.log('item', item);
+    console.log('item', curItem);
   }
   return panel;
 };

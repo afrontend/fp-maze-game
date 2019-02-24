@@ -14,10 +14,12 @@ import {
 
 const getWallClassName = props => {
   const className = ['block'];
-  if(props.top) className.push('top');
-  if(props.right) className.push('right');
-  if(props.bottom) className.push('bottom');
-  if(props.left) className.push('left');
+  if (props.wall) {
+    if (props.wall.up) className.push('up');
+    if (props.wall.right) className.push('right');
+    if (props.wall.down) className.push('down');
+    if (props.wall.left) className.push('left');
+  }
   return className.join(' ');
 };
 
@@ -31,7 +33,7 @@ const createBlocks = ary => (
   ary.map(
     (item, index) => (
       <Block item={item} color={item.color} key={index}>
-        {item.links === null ? ' ' : (item.links.length === 0 ? 'O' : ' ')}
+        {item.depth}
       </Block>
     )
   )
