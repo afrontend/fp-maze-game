@@ -13,8 +13,7 @@ import './App.css';
 const CONFIG = {
   rows: 40,
   columns: 40,
-  color: 'grey' ,
-  pathColor: 'blue'
+  color: 'grey'
 };
 
 // panel functions
@@ -31,6 +30,7 @@ const getAry = (len, fn) => (
 
 const convert1DimAry = _.flattenDepth;
 const convert2DimAry = fp.chunk(CONFIG.columns)
+
 const createItem = () => ({
   color: CONFIG.color,
   links: null,
@@ -43,6 +43,7 @@ const createItem = () => ({
     left: false
   }
 });
+
 const addPos = (panel) => {
   panel.forEach((rows, rIndex) => (
     rows.forEach((item, cIndex) => {
@@ -64,29 +65,20 @@ const addStartItem = (panel) => {
   startItem.color = getColor(startItem);
   return panel;
 };
-const createPanel = () => (addStartItem(addPos(convert2DimAry(getAry(CONFIG.columns * CONFIG.rows, createItem)))));
 
+const createPanel = () => (addStartItem(addPos(convert2DimAry(getAry(CONFIG.columns * CONFIG.rows, createItem)))));
 const createPathPanel = _.flow([createPanel]);
 
-// path
-
-const tee = (args) => {
-  console.log("tee", args);
-  return args;
-}
+// tree
 
 const getItem = (panel, pos) => {
-  // return panel && pos.row && pos.col && panel[pos.row] && panel[pos.row][pos.col] ? panel[pos.row][pos.col] : null;
   return panel[pos.row][pos.col];
 };
 
 const getLeafItem = (panel) => {
   const ary = _.shuffle(convert1DimAry(panel));
   const leafItems = _.head(_.shuffle(_.filter(ary, (item) => (item.willVisit === true && item.links === null))));
-  if (_.isEmpty(leafItems)) {
-    return null;
-  }
-  return getItem(panel, leafItems.pos);
+  return _.isEmpty(leafItems) ? null : getItem(panel, leafItems.pos);
 };
 
 const getColor = (item) => {
@@ -118,7 +110,7 @@ const markLastItem = (panel) => {
   return panel;
 }
 
-const fillTree = (panel) => {
+const markTree = (panel) => {
   const curItem = getLeafItem(panel);
   if (curItem) {
     curItem.visited = true;
@@ -135,15 +127,10 @@ const fillTree = (panel) => {
       nextItem.color = getColor(nextItem);
       nextItem.depth = curItem.depth + 1;
     });
-    console.log('item', curItem);
   } else {
-    markLastItem(panel);
+    return markLastItem(panel);
   }
   return panel;
-};
-
-const markTree = (panel) => {
-  return fillTree(panel);
 }
 
 export const initPathPanel = () => ({pathPanel: createPathPanel()});

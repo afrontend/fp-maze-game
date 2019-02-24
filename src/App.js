@@ -5,6 +5,7 @@ https://github.com/afrontend/fp-maze-game
 */
 
 import React, { Component } from 'react';
+import _ from 'lodash';
 import './App.css';
 import {
   initPathPanel,
@@ -41,12 +42,17 @@ const createBlocks = ary => (
 
 const Blocks = props => (createBlocks(props.window));
 
+const speedUp = (fn) => (_.flow([fn, fn, fn, fn, fn, fn, fn, fn, fn]));
+
+const updatePathPanel = speedUp(markPathPanel);
+
 class App extends Component {
   constructor(props) {
     super(props);
+    // this.state = markPathPanel(initPathPanel());
     this.state = initPathPanel();
     this.state.timer = setInterval(() => {
-      this.setState((state) => (markPathPanel(state)));
+      this.setState((state) => (updatePathPanel(state)));
     });
   }
 
