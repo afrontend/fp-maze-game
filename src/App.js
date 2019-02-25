@@ -34,7 +34,7 @@ const createBlocks = ary => (
   ary.map(
     (item, index) => (
       <Block item={item} color={item.color} key={index}>
-        {' '}
+        {item.mark ? item.mark : ' '}
       </Block>
     )
   )

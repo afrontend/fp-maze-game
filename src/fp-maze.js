@@ -53,12 +53,13 @@ const addPos = (panel) => {
 }
 
 const addStartItem = (panel) => {
-  const startItem = panel[0][0];
+  const startItem = panel[0][20];
   startItem.willVisit = true;
   startItem.depth = 1;
+  startItem.mark = 'S';
   startItem.pos = {
     row: 0,
-    col: 0
+    col: 20
   };
   startItem.color = getColor(startItem);
   return panel;
@@ -105,13 +106,13 @@ const getAdjacentPosition = (panel, pos, testFn ) => {
       adjacentPositions.push(p);
     }
   });
-  return adjacentPositions;
+  return _.shuffle(adjacentPositions);
 };
 
 const markLastItem = (panel) => {
   const ary = convert1DimAry(panel);
   const lastItem = _.maxBy(ary, (item) => (item.depth));
-  lastItem.color = 'red';
+  lastItem.mark = 'E';
   return panel;
 }
 
