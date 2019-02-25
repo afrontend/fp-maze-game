@@ -12,8 +12,7 @@ import './App.css';
 
 const CONFIG = {
   rows: 40,
-  columns: 40,
-  color: 'grey'
+  columns: 40
 };
 
 // panel functions
@@ -32,7 +31,6 @@ const convert1DimAry = _.flattenDepth;
 const convert2DimAry = fp.chunk(CONFIG.columns)
 
 const createItem = () => ({
-  color: CONFIG.color,
   links: null,
   visited: false,
   willVisit: false,
