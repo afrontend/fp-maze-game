@@ -75,10 +75,17 @@ const getItem = (panel, pos) => {
   return panel[pos.row][pos.col];
 };
 
+const getSomeLeafItem = _.flow([
+  convert1DimAry,
+  _.shuffle,
+  fp.filter((item) => (item.willVisit === true && item.links === null)),
+  _.shuffle,
+  _.head
+]);
+
 const getLeafItem = (panel) => {
-  const ary = _.shuffle(convert1DimAry(panel));
-  const leafItems = _.head(_.shuffle(_.filter(ary, (item) => (item.willVisit === true && item.links === null))));
-  return _.isEmpty(leafItems) ? null : getItem(panel, leafItems.pos);
+  const leafItem = getSomeLeafItem(panel);
+  return _.isEmpty(leafItem) ? null : getItem(panel, leafItem.pos);
 };
 
 const getColor = (item) => {
