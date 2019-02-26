@@ -65,7 +65,13 @@ const addStartItem = (panel) => {
   return panel;
 };
 
-const createPanel = () => (addStartItem(addPos(convert2DimAry(getAry(CONFIG.columns * CONFIG.rows, createItem)))));
+const createPanel = _.flow([
+  () => (getAry(CONFIG.columns * CONFIG.rows, createItem)),
+  convert2DimAry,
+  addPos,
+  addStartItem,
+]);
+
 const createPathPanel = _.flow([createPanel]);
 
 // tree
@@ -95,10 +101,10 @@ const getColor = (item) => {
 const getAdjacentPosition = (panel, pos, testFn ) => {
   const adjacentPositions = [];
   const fourWayPos = _.shuffle([
-    {row: pos.row - 1, col: pos.col, direction: 'up', rDirection: 'down'},
-    {row: pos.row, col: pos.col + 1, direction: 'right', rDirection: 'left'},
-    {row: pos.row + 1, col: pos.col, direction: 'down', rDirection: 'up'},
-    {row: pos.row, col: pos.col - 1, direction: 'left', rDirection: 'right'}
+    { row: pos.row - 1, col: pos.col, direction: 'up', rDirection: 'down' },
+    { row: pos.row, col: pos.col + 1, direction: 'right', rDirection: 'left' },
+    { row: pos.row + 1, col: pos.col, direction: 'down', rDirection: 'up' },
+    { row: pos.row, col: pos.col - 1, direction: 'left', rDirection: 'right' }
   ]);
   _.each(fourWayPos, (p) => {
     const item = panel[p.row] && panel[p.row][p.col] ? panel[p.row][p.col] : undefined;
@@ -123,8 +129,8 @@ const markTree = (panel) => {
     curItem.willVisit = false;
     curItem.color = getColor(curItem);
     curItem.links = getAdjacentPosition(panel, curItem.pos, (item) => (
-      item.visited !== true && item.willVisit !== true)
-    );
+      item.visited !== true && item.willVisit !== true
+    ));
     _.each(curItem.links, (pos) => {
       curItem.wall[pos.direction] = true;
       const nextItem = getItem(panel, pos);
@@ -139,7 +145,7 @@ const markTree = (panel) => {
   return panel;
 }
 
-export const initPathPanel = () => ({pathPanel: createPathPanel()});
+export const initPathPanel = () => ({ pathPanel: createPathPanel() });
 export const markPathPanel = (state) => ({ pathPanel: markTree(state.pathPanel) });
 export const joinPathPanel = (state) => (convert1DimAry(state.pathPanel));
 
