@@ -142,7 +142,7 @@ const markTree = (panel) => {
   } else {
     return markLastItem(panel);
   }
-  return panel;
+  return markTree(panel);
 }
 
 export const initPathPanel = () => ({ pathPanel: createPathPanel() });
