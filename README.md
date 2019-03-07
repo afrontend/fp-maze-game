@@ -8,12 +8,12 @@
 * [lodash](https://lodash.com/)
 * [react](https://reactjs.org/)
 
-# Install
+# Installation
 
     git clone https://github.com/afrontend/fp-maze-game
     cd fp-maze-game
     npm install
 
-# Run
+# Usage
 
     npm start
