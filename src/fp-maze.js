@@ -6,7 +6,6 @@ https://github.com/afrontend/fp-maze-game
 
 import _ from 'lodash';
 import fp from 'lodash/fp';
-import './App.css';
 
 // configuration
 
