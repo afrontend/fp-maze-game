@@ -21,4 +21,4 @@
 
 # Web
 
-https://afrontend.github.io/game/fp-maze-game/
+https://afrontend.github.io/fp-maze-game/
