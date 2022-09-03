@@ -148,4 +148,3 @@ export const initPathPanel = () => ({ pathPanel: createPathPanel() });
 export const markPathPanel = (state) => ({ pathPanel: markTree(state.pathPanel) });
 export const joinPathPanel = (state) => (convert1DimAry(state.pathPanel));
 
-export default {};
